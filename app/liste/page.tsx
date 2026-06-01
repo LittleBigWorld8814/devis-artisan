@@ -3,6 +3,15 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
+import { PDFDownloadLink } from '@react-pdf/renderer'
+import DevisPDF from '@/components/DevisPDF'
+
+type Ligne = {
+  description: string
+  quantite: number
+  prix_unitaire: number
+  total: number
+}
 
 type Devis = {
   id: string
@@ -11,6 +20,7 @@ type Devis = {
   total: number
   statut: string
   date_creation: string
+  lignes_devis: Ligne[]
 }
 
 export default function ListeDevis() {
@@ -19,9 +29,9 @@ export default function ListeDevis() {
 
   useEffect(() => {
     const charger = async () => {
-      const { data, error } = await supabase
+        const { data, error } = await supabase
         .from('devis')
-        .select('*')
+        .select('*, lignes_devis(*)')
         .order('created_at', { ascending: false })
 
       if (!error && data) setDevis(data)
@@ -75,6 +85,31 @@ export default function ListeDevis() {
               {d.statut}
             </div>
           </div>
+            <PDFDownloadLink
+            document={
+                <DevisPDF
+                numero={d.numero}
+                client={d.notes || 'Sans client'}
+                date={d.date_creation}
+                lignes={d.lignes_devis || []}
+                total={Number(d.total)}
+                />
+            }
+            fileName={`${d.numero}.pdf`}
+            style={{
+                display: 'block',
+                marginTop: '0.5rem',
+                padding: '4px 10px',
+                background: '#e8f4fd',
+                color: '#0070f3',
+                borderRadius: '4px',
+                textDecoration: 'none',
+                fontSize: '0.8rem',
+                textAlign: 'center'
+            }}
+            >
+            {({ loading }) => loading ? 'Génération...' : '⬇ Télécharger PDF'}
+            </PDFDownloadLink>
         </div>
       ))}
     </main>
