@@ -51,16 +51,35 @@ export default function ListeDevis() {
 
   return (
     <main style={{ maxWidth: '700px', margin: '2rem auto', fontFamily: 'sans-serif', padding: '0 1rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <h1>Mes devis</h1>
         <Link
-          href="/devis"
-          style={{ padding: '0.5rem 1rem', background: '#0070f3', color: 'white', borderRadius: '4px', textDecoration: 'none' }}
+            href="/devis"
+            style={{ padding: '0.5rem 1rem', background: '#0070f3', color: 'white', borderRadius: '4px', textDecoration: 'none' }}
         >
-          + Nouveau devis
+            + Nouveau devis
         </Link>
-      </div>
-
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+        <h1>Mes devis</h1>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <Link
+            href="/devis"
+            style={{ padding: '0.5rem 1rem', background: '#0070f3', color: 'white', borderRadius: '4px', textDecoration: 'none' }}
+            >
+            + Nouveau devis
+            </Link>
+            <button
+            onClick={async () => {
+                await supabase.auth.signOut()
+                router.push('/connexion')
+            }}
+            style={{ padding: '0.5rem 1rem', background: '#fee', color: '#c00', border: '1px solid #fcc', borderRadius: '4px', cursor: 'pointer' }}
+            >
+            Déconnexion
+            </button>
+        </div>
+        </div>
       {loading && <p>Chargement...</p>}
 
       {!loading && devis.length === 0 && (
