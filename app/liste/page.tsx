@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 import { PDFDownloadLink } from '@react-pdf/renderer'
 import DevisPDF from '@/components/DevisPDF'
+import { useRouter } from 'next/navigation'
 
 type Ligne = {
   description: string
@@ -26,10 +27,18 @@ type Devis = {
 export default function ListeDevis() {
   const [devis, setDevis] = useState<Devis[]>([])
   const [loading, setLoading] = useState(true)
+  const router = useRouter()
 
   useEffect(() => {
     const charger = async () => {
-        const { data, error } = await supabase
+      // Vérifier si connecté
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        router.push('/connexion')
+        return
+      }
+
+      const { data, error } = await supabase
         .from('devis')
         .select('*, lignes_devis(*)')
         .order('created_at', { ascending: false })
@@ -38,7 +47,7 @@ export default function ListeDevis() {
       setLoading(false)
     }
     charger()
-  }, [])
+  }, [router])
 
   return (
     <main style={{ maxWidth: '700px', margin: '2rem auto', fontFamily: 'sans-serif', padding: '0 1rem' }}>
