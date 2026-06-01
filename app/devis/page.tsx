@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
+
 type Ligne = {
   description: string
   quantite: number
@@ -27,8 +28,48 @@ export default function NouveauDevis() {
       }
     }))
   }
-  console.log('lignes:', lignes)
+
   const total = lignes.reduce((sum, l) => sum + (l.quantite * l.prix_unitaire), 0)
+
+  const sauvegarder = async () => {
+    const { data: devisData, error: devisError } = await supabase
+      .from('devis')
+      .insert({
+        numero: `DEV-${Date.now()}`,
+        notes: client,
+        total: total
+      })
+      .select()
+      .single()
+
+    if (devisError) {
+      alert('Erreur : ' + devisError.message)
+      return
+    }
+
+    const lignesAInserer = lignes
+      .filter(l => l.description.trim() !== '')
+      .map(l => ({
+        devis_id: devisData.id,
+        description: l.description,
+        quantite: l.quantite,
+        prix_unitaire: l.prix_unitaire,
+        total: l.quantite * l.prix_unitaire
+      }))
+
+    const { error: lignesError } = await supabase
+      .from('lignes_devis')
+      .insert(lignesAInserer)
+
+    if (lignesError) {
+      alert('Erreur lignes : ' + lignesError.message)
+      return
+    }
+
+    alert('Devis sauvegardé avec toutes les lignes !')
+    setClient('')
+    setLignes([{ description: '', quantite: 1, prix_unitaire: 0 }])
+  }
 
   return (
     <main style={{ maxWidth: '700px', margin: '2rem auto', fontFamily: 'sans-serif', padding: '0 1rem' }}>
@@ -99,23 +140,12 @@ export default function NouveauDevis() {
         Total : {total.toFixed(2)} €
       </div>
 
-    <button
-    onClick={async () => {
-        const { error } = await supabase.from('devis').insert({
-        numero: `DEV-${Date.now()}`,
-        notes: client,
-        total: total
-        })
-        if (error) {
-        alert('Erreur : ' + error.message)
-        } else {
-        alert('Devis sauvegardé !')
-        }
-    }}
-    style={{ width: '100%', padding: '0.75rem', background: '#0070f3', color: 'white', border: 'none', borderRadius: '4px', fontSize: '1rem', cursor: 'pointer' }}
-    >
-    Sauvegarder le devis
-    </button>
+      <button
+        onClick={sauvegarder}
+        style={{ width: '100%', padding: '0.75rem', background: '#0070f3', color: 'white', border: 'none', borderRadius: '4px', fontSize: '1rem', cursor: 'pointer' }}
+      >
+        Sauvegarder le devis
+      </button>
     </main>
   )
 }
