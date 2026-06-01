@@ -53,15 +53,6 @@ export default function ListeDevis() {
     <main style={{ maxWidth: '700px', margin: '2rem auto', fontFamily: 'sans-serif', padding: '0 1rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <h1>Mes devis</h1>
-        <Link
-            href="/devis"
-            style={{ padding: '0.5rem 1rem', background: '#0070f3', color: 'white', borderRadius: '4px', textDecoration: 'none' }}
-        >
-            + Nouveau devis
-        </Link>
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h1>Mes devis</h1>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
             <Link
             href="/devis"
